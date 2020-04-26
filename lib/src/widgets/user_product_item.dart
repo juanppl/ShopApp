@@ -5,11 +5,11 @@ import 'package:shop_app/src/providers/products_provider.dart';
 
 class UserProductItem extends StatelessWidget {
   final ProductModel product;
-
-  UserProductItem(this.product);
+  UserProductItem({Key key, this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(product.imageUrl),
@@ -22,13 +22,21 @@ class UserProductItem extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.edit),
               onPressed: () {
-                Navigator.of(context).pushNamed('/editProducts',arguments: product.id);
+                Navigator.of(context)
+                    .pushNamed('/editProducts', arguments: product.id);
               },
             ),
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
-                Provider.of<ProductsProvider>(context,listen: false).removeProduct(product.id);
+              onPressed: () async {
+                try {
+                  await Provider.of<ProductsProvider>(context, listen: false)
+                      .removeProduct(product.id);
+                } catch (error) {
+                  scaffold.showSnackBar(SnackBar(
+                    content: Text('Failed deleting product'),
+                  ));
+                }
               },
             ),
           ],

@@ -10,7 +10,6 @@ class ProductDetailPage extends StatelessWidget {
     final productBuild = Provider.of<ProductsProvider>(context, listen: false)
         .findProductById(id);
     return Scaffold(
-      drawer: AppDrawer(),
       appBar: AppBar(
         title: Text(productBuild.title),
       ),
@@ -19,10 +18,13 @@ class ProductDetailPage extends StatelessWidget {
           children: <Widget>[
             Container(
               height: 300,
-              child: Image.network(
-                productBuild.imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
+              child: Hero(
+                tag: productBuild.id,
+                child: Image.network(
+                  productBuild.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
             SizedBox(height: 10,),

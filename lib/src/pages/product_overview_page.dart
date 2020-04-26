@@ -6,7 +6,35 @@ import 'package:shop_app/src/widgets/badge.dart';
 import 'package:shop_app/src/widgets/drawer.dart';
 import 'package:shop_app/src/widgets/products_builder.dart';
 
-class ProductsOverview extends StatelessWidget {
+class ProductsOverview extends StatefulWidget {
+  @override
+  _ProductsOverviewState createState() => _ProductsOverviewState();
+}
+
+class _ProductsOverviewState extends State<ProductsOverview> {
+  /* @override
+  void initState() {
+    Provider.of<ProductsProvider>(context,listen: false).fetchAllProducts(); 
+    super.initState();
+  } */
+  bool _isLoading = true;
+  bool _isFetching = false;
+  @override
+  void didChangeDependencies() {
+    if (_isLoading) {
+      setState(() {
+        _isFetching = true;
+      });
+      Provider.of<ProductsProvider>(context).fetchAllProducts().then((_) {
+        setState(() {
+          _isFetching = false;
+        });
+      });
+    }
+    _isLoading = false;
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<ProductsProvider>(context);
@@ -37,22 +65,23 @@ class ProductsOverview extends StatelessWidget {
                 ];
               }),
           Consumer<CartProvider>(
-            builder: (context, cartData , child){
+            builder: (context, cartData, child) {
               return Badge(
                 child: child,
                 value: cartData.itemCount.toString(),
               );
             },
             child: IconButton(
-              icon: Icon(Icons.shopping_cart), 
-              onPressed: () {
-                Navigator.of(context).pushNamed('/cart');
-              }
-            ),
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/cart');
+                }),
           ),
         ],
       ),
-      body: ProductsBuilder(),
+      body: _isFetching
+          ? Center(child: CircularProgressIndicator())
+          : ProductsBuilder(),
     );
   }
 }
